@@ -6,7 +6,6 @@ print("arguments", sys.argv)
 day = int(sys.argv[1]) # e.g., 1 for day 1
 print(f"Running pipeline for day {day}")
 
-
 df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
 print(df.head())
 
