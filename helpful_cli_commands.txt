@@ -1,0 +1,40 @@
+'''
+THE TWO POSTGRES-RELATED DOCKER COMMANDS ARE NOT NECESSARY BECAUSE THEY ARE ALREADY IN THE docker-compose.yml FILE.
+HOWEVER, THEY ARE KEPT HERE FOR REFERENCE PURPOSES.
+'''
+
+'''
+## This command runs a Postgres container with a named volume (ny_taxi_postgres_data) and a custom network (pg-network).
+## This container will also be identified by the name "pgdatabase".
+docker run -it \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxi" \
+    -v ny_taxi_postgres_data:/var/lib/postgresql \
+    -p 5432:5432 \
+    --network=pg-network \
+    --name pgdatabase \
+    postgres:18
+
+# This command runs the pgAdmin container on the same network (pg-network) as the postgres container above.
+docker run -it \
+  -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+  -e PGADMIN_DEFAULT_PASSWORD="root" \
+  -v pgadmin_data:/var/lib/pgadmin \
+  -p 8085:80 \
+  --network=pg-network \
+  --name pgadmin \
+  dpage/pgadmin4
+'''
+
+## This command builds a Docker image using ingest_data.py as the main application file and will create a container from the image.
+## This container will communicate with the pgdatabase container via the pg-network.
+docker run -it \
+    --network=data-engineering-zoomcamp_default \
+    taxi_ingest:v001 \
+    --pg-user=root \
+    --pg-pass=root \
+    --pg-host=pgdatabase \
+    --pg-port=5432 \
+    --pg-db=ny_taxi \
+    --target-table=yellow_taxi_trips

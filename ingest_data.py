@@ -1,9 +1,13 @@
+## The purpose of this file is to ingest data from a NY Taxi URL into a Postgres database
+## This file was created as a snapshot of the demo_notebook.ipynb Jupyter notebook
+
 #!/usr/bin/env python
 # coding: utf-8
 
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm.auto import tqdm
+import click # library to allow you to add command line parameters
 
 ## SET TABLE COLUMN DATA TYPES
 dtype = {
@@ -31,20 +35,28 @@ parse_dates = [
     "tpep_dropoff_datetime"
 ]
 
-def run():
+@click.command()
+@click.option('--pg-user', default='root', help='PostgreSQL user')
+@click.option('--pg-pass', default='root', help='PostgreSQL password')
+@click.option('--pg-host', default='localhost', help='PostgreSQL host')
+@click.option('--pg-port', default=5432, type=int, help='PostgreSQL port')
+@click.option('--pg-db', default='ny_taxi', help='PostgreSQL database name')
+@click.option('--target-table', default='yellow_taxi_trips', help='Target table name')
+def run(pg_user, pg_pass, pg_host, pg_port, pg_db, target_table):
     ## SET PARAMETERS
     year = 2021
     month = 1
 
-    pg_user = 'root'
-    pg_pass = 'root'
-    pg_host = 'localhost'
-    pg_port = 5432
-    pg_db = 'ny_taxi'
+    ## These parameters are also set up via command line options (click library). So these are unused now.
+    #pg_user = 'root'
+    #pg_pass = 'root'
+    #pg_host = 'localhost'
+    #pg_port = 5432
+    #pg_db = 'ny_taxi'
+    
+    #target_table = 'yellow_taxi_data'
 
     chunk_size = 100000
-
-    target_table = 'yellow_taxi_data'
 
     ## READ DATA
     prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
@@ -69,9 +81,9 @@ def run():
     )
 
     # Run this to see the SQL statement that will be generated to create this table
-    print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
+    print(pd.io.sql.get_schema(df, name=target_table, con=engine))
 
-    table_not_created = False
+    table_not_created = True
 
     # Run this line to create the table called 'yellow_taxi_data' with just the columns without adding any data
     #df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
