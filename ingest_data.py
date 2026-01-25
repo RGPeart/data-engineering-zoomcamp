@@ -1,18 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import pandas as pd
+from sqlalchemy import create_engine
+from tqdm.auto import tqdm
 
-
-# # Setting Data Types for Taxi Data
-# The data types in the csv data file isn't specified, which will raise a warning about mismatched data. We can set the data types of the columns so that pandas does not make any assumptions.
-
-# In[7]:
-
-
+## SET TABLE COLUMN DATA TYPES
 dtype = {
     "VendorID": "Int64",
     "passenger_count": "Int64",
@@ -32,97 +25,77 @@ dtype = {
     "congestion_surcharge": "float64"
 }
 
+## SET THE DATE COLUMNS THAT WILL NEED TO BE PARSED USING parse_dates
 parse_dates = [
     "tpep_pickup_datetime",
     "tpep_dropoff_datetime"
 ]
 
+def run():
+    ## SET PARAMETERS
+    year = 2021
+    month = 1
 
-# In[8]:
+    pg_user = 'root'
+    pg_pass = 'root'
+    pg_host = 'localhost'
+    pg_port = 5432
+    pg_db = 'ny_taxi'
 
+    chunk_size = 100000
 
-prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
-url = f'{prefix}/yellow_tripdata_2021-01.csv.gz'
-print(url)
+    target_table = 'yellow_taxi_data'
 
+    ## READ DATA
+    prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
+    url = f'{prefix}/yellow_tripdata_{year}-{month:02d}.csv.gz'
 
-# In[11]:
-
-
-df = pd.read_csv(
-    url,
-    dtype=dtype, # Pulled from dtype variable designed above
-    parse_dates=parse_dates # Pulled from parse_date variable designed above
-)
-
-
-# In[12]:
-
-
-df.head(5)
-
-
-# # Load Data into Postgres
-
-# In[15]:
-
-
-from sqlalchemy import create_engine
-engine = create_engine('postgresql://root:root@localhost:5432/ny_taxi')
-
-
-# In[16]:
-
-
-# Run this to see the SQL statement that will be generated to create this table
-print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
-
-
-# In[17]:
-
-
-# Run this line to create the table called 'yellow_taxi_data' with just the columns without adding any data
-#df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
-
-
-# In[18]:
-
-
-# Because this file contains over 1 Million rows, it is best that we break this up into multiple iterations
-df_iter = pd.read_csv(
-    url,
-    dtype=dtype,
-    parse_dates=parse_dates,
-    iterator=True,
-    chunksize=100000
-)
-
-
-# In[20]:
-
-
-from tqdm.auto import tqdm
-
-table_not_created = False
-
-for df_chunk in tqdm(df_iter):
-
-    if table_not_created:
-        # Create table schema (no data)
-        df_chunk.head(0).to_sql(
-            name="yellow_taxi_data",
-            con=engine,
-            if_exists="replace"
-        )
-        table_not_created = False
-        print("Table created")
-
-    # Insert chunk
-    df_chunk.to_sql(
-        name="yellow_taxi_data",
-        con=engine,
-        if_exists="append"
+    df = pd.read_csv(
+        url,
+        dtype=dtype, # Pulled from dtype variable designed above
+        parse_dates=parse_dates # Pulled from parse_date variable designed above
     )
 
-    print("Inserted:", len(df_chunk))
+    ## LOAD DATA INTO POSTGRES
+    engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
 
+    # Because this file contains over 1 Million rows, it is best that we break this up into multiple iterations
+    df_iter = pd.read_csv(
+        url,
+        dtype=dtype,
+        parse_dates=parse_dates,
+        iterator=True,
+        chunksize=chunk_size
+    )
+
+    # Run this to see the SQL statement that will be generated to create this table
+    print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
+
+    table_not_created = False
+
+    # Run this line to create the table called 'yellow_taxi_data' with just the columns without adding any data
+    #df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
+
+    for df_chunk in tqdm(df_iter):
+
+        if table_not_created:
+            # Create table schema (no data)
+            df_chunk.head(0).to_sql(
+                name=target_table,
+                con=engine,
+                if_exists="replace"
+            )
+            table_not_created = False
+            print("Table created")
+
+        # Insert chunk
+        df_chunk.to_sql(
+            name=target_table,
+            con=engine,
+            if_exists="append"
+        )
+
+        print("Inserted:", len(df_chunk))
+
+if __name__ == '__main__':
+    run()
