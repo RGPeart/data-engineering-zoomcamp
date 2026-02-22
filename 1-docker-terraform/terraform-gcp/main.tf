@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "7.16.0"
     }
   }
@@ -9,13 +9,14 @@ terraform {
 
 provider "google" {
   # Configuration options
-  project     = "rgpeart-datatalks-de-course"
-  region      = "us-east4"
+  credentials = file(var.credentials_path)
+  project = var.project
+  region  = var.region
 }
 
 resource "google_storage_bucket" "demo-bucket" {
-  name          = "rgpeart-datatalks-de-course-terra-bucket"
-  location      = "US"
+  name          = var.gcs_bucket_name
+  location      = var.location
   force_destroy = true
 
   # Lifecycle rule to automatically delete objects after 1 day if they are not fully uploaded (incomplete multipart uploads)
@@ -28,4 +29,9 @@ resource "google_storage_bucket" "demo-bucket" {
       type = "AbortIncompleteMultipartUpload"
     }
   }
+}
+
+resource "google_bigquery_dataset" "demo_dataset" {
+  dataset_id = var.bq_dataset_name
+  location = var.location
 }
