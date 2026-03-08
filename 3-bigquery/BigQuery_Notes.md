@@ -1,22 +1,24 @@
 # Data Warehouse and BigQuery
 
+This module does not have any repository changes. Below are my notes from watching all module videos.
+
 ## OnLine Analytical Processing (OLAP)  vs. OnLine Transaction Processing (OLTP)
 
-|---------|  OLTP    | OLAP |
+|---------|  **OLTP**    | **OLAP** |
 |---------|----------|------|
-| Purpose | Control and run essential business operations in real time | Plan, solve problems, support decisions, discover hidden insights, etc. |
-| Data Updates | Short, fast updates initiated by the user | Data periodically refreshed with scheduled, long-running batch jobs |
-| Database Design | Normalized databases for efficiency | Denormalized databases for analysis |
-| Space Requirements | Generally small if historical data is archived | Generally large due to aggregating large datasets| 
+| **Purpose** | Control and run essential business operations in real time | Plan, solve problems, support decisions, discover hidden insights, etc. |
+| **Data Updates** | Short, fast updates initiated by the user | Data periodically refreshed with scheduled, long-running batch jobs |
+| **Database Design** | Normalized databases for efficiency | Denormalized databases for analysis |
+| **Space Requirements** | Generally small if historical data is archived | Generally large due to aggregating large datasets| 
 
-- Data Warehouse (DW) is an OLAP solution meant for reporting and data analysis. Unlike data lakes, which follow the ELT model, DWs commonly use the ETL model
-- A DW receives data from data sources which is then processed in a staging area before being ingested to the actual warehouse (a.k.a. a database) and arranged as needed. DWs may then feed data to separate Data Marts; smaller database systems which end users may use for different purposes
+- **Data Warehouse** (**DW**) is an **_OLAP solution_** meant for **reporting and data analysis**. Unlike data lakes, which follow the ELT model, DWs commonly use the ETL model
+- A DW receives data from data sources which is then processed in a **_staging area_** before being ingested to the actual warehouse (a.k.a. **a database**) and arranged as needed. DWs may then feed data to separate Data Marts; smaller database systems which end users may use for different purposes
 
 
-- BigQuery is a Serverless Data Warehouse offered on the Google Cloud Platform
+- **BigQuery** is a **Serverless Data Warehouse** offered on the Google Cloud Platform
    - There are no servers to manage or database software to install
 - Software as well as infrastructure including
-   - Scalability and High-Availability
+   - **Scalability** and **High-Availability**
    - Google takes care of the underlying software and infrastructure management for you
 - Built-in features like:
    - Machine learning
@@ -25,22 +27,22 @@
 - BigQuery maximizes flexibility by separating the compute engine that analyzes your data from your storage
    - This allows the user to budget and reduce their costs
 - Some alternatives to BigQuery from other cloud providers include AWS Redshift or Azure Synapse Analytics
-- BigQuery's pricing model is separated into 2 main components (Processing and Storage):
-   - Processing
+- BigQuery's pricing model is separated into 2 main components (**Processing** and **Storage**):
+   - **Processing**
       - On-Demand Pricing (default): Example: $5 per TB used per month; the first TB of the month is free
       - Flat Rate Pricing: based on the number of pre-requested slots (virtual CPUs)
          - Queries take up slots. If you're running multiple queries and run out of slots, the additional queries must wait until other queries finish in order to free up a slot and run the query waiting in the queue
          - The flat rate provides 100 slots. So you would have to be using over 400 TB of data processing to consider this option (100 slots at about $2,000 per month)
-   - Storage
+   - **Storage**
       - The data that is stored in the tables, views, and other BigQuery specific objects
 
 ## External Tables
--  BigQuery allows you to create External Tables where the data is actually stored in another area outside of BigQuery
+-  BigQuery allows you to create <span style="color:yellow">**External Tables**</span> where the data is actually stored in another area outside of BigQuery
    - But the metadata (such as the table schema) is stored within BigQuery and can still be combined with other tables and queried
    - Be aware that BQ cannot determine processing costs of external tables
 
 ## Partitioning
-- BigQuery tables can be partitioned into multiple smaller tables
+- BigQuery tables can be <span style="color:yellow">**partitioned**</span> into multiple smaller tables
    - Partition tables are very useful to improve performance and reduce costs because BQ will not process as much data per query
    - For example, if we often filter queries based on date, we could partition a table based on date so that we only query a specific sub-table based on the date we are interested in
    - It is best to partition tables based on:
@@ -50,12 +52,12 @@
    - Querying a partitioned table is the exact same as a regular table, with the only difference being the amount of data processed will be drastically different
 
 ## Clustering
-- Table Clustering consists of rearranging a table based on the values of its columns so that the table is ordered according to any criteria
+- Table <span style="color:yellow">**Clustering**</span> consists of rearranging a table based on the values of its columns so that the table is ordered according to any criteria
    - Clustering can be done based on one or multiple columns, up to 4 columns at one time
    - The order of the columns in which the clustering is specified is important in order to determine the column priority
    - Clustering can improve performance and lower costs on big datasets for certain types of queries, such as queries that use filter clauses and queries that aggregate data
       - For example, all the similar columns will be clustered together before they are filtered out much more quickly
-   - Clustering columns must be top-level, non-repeated columns, such as:
+   - Clustering columns must be **top-level, non-repeated** columns, such as:
       - DATE
       - BOOL
       - NUMERIC
@@ -77,13 +79,13 @@
 # Partitioning and Clustering
 
 ## Partitioning vs. Clustering
-| Topic | Partitioning | Clustering | 
+| **Topic** | **Partitioning** | **Clustering** | 
 | ----- | ------------ | ---------- |
-| Cost  | Cost known upfront. BQ can estimate the amount of data to be processed before running a query | Cost benefit unknown. BQ cannot estimate the reduction in cost before running a query
-| Granularity | Low granularity. Only a single column can be used to partition the table | High granularity. Multiple criteria can be used to sort the table |
-| Data Movement | Partitions can be added, deleted, modified, or even moved between storage options | Clusters are "fixed in place" |
-| Use Case | Benefits when you filter or aggregate on a single column | Benefits from queries that commonly use filters or aggregation against multiple particular columns |
-| Limitations | Limited to 4000 partitions; cannot be used in columns with larger cardinality | Unlimited amount of clusters; useful when the cardinality of the number of values a column or group of columns is large |
+| **Cost**  | Cost known upfront. BQ can estimate the amount of data to be processed before running a query | Cost benefit unknown. BQ cannot estimate the reduction in cost before running a query
+| **Granularity** | Low granularity. Only a single column can be used to partition the table | High granularity. Multiple criteria can be used to sort the table |
+| **Data Movement** | Partitions can be added, deleted, modified, or even moved between storage options | Clusters are "fixed in place" |
+| **Use Case** | Benefits when you filter or aggregate on a single column | Benefits from queries that commonly use filters or aggregation against multiple particular columns |
+| **Limitations** | Limited to 4000 partitions; cannot be used in columns with larger cardinality | Unlimited amount of clusters; useful when the cardinality of the number of values a column or group of columns is large |
 
 - You may choose clustering over partitioning when:
    - Partitioning results in a small amount of data per partition (approximately less than 1 GB per partition)
@@ -128,13 +130,13 @@
 
 ## BigQuery Architecture
 - BigQuery is built on 4 infrastructure technologies:
-   - **Dremel**: the compute part of BQ. This executes the SQL queries
-      - Dremel turns SQL queries into execution trees. The leaves of the trees are called slots and the branches are called mixers
-         - The slots are in charge of reading data from storage and perform calculations
-         - The mixers perform aggregations
+   - **Dremel**: the **_compute_** part of BQ. This executes the SQL queries
+      - Dremel turns SQL queries into execution trees. The leaves of the trees are called slots and the branches are called **_mixers_**
+         - The **slots** are in charge of reading data from storage and perform calculations
+         - The **mixers** perform aggregations
       - Dremel dynamically apportions slots to queries as needed, while maintaining fairness for concurrent queries from multiple users
    - **Colossus**: Google's global storage system
-      - BQ leverages columnar storage format and compression algorithms to store data
+      - BQ leverages **_columnar storage format_** and compression algorithms to store data
       - Colossus is optimized for reading large amounts of structured data
       - Colossus also handles replication recovery and distributed management
    - **Jupiter**: the network that connects Dremel and Colossus
@@ -146,13 +148,13 @@
 
 
 ## Column-Oriented vs Record-Oriented Storage
-- Traditional methods for tabular data storage are record-oriented (a.k.a. row-oriented)
+- Traditional methods for tabular data storage are **record-oriented** (a.k.a. **row-oriented**)
    - Data is read sequentially row by row and then the columns are accessed per row
    - An example is a CSV file, where each new line in the file is a record and all info for that specific record is contained within that line
-- BigQuery uses a columnar storage format
+- BigQuery uses a **columnar storage format**
    - Data is stored according to the columns of the table rather than the rows
    - This is beneficial when dealing with massive amounts of data because it allows us to discard right away the columns we're not interested in when performing queries (which reduce the amount of processed data)
-- When performing queries, Dremel modifies them in order to create an execution tree: parts of the query are assigned to different mixers, which in turn assign even smaller parts to different slots which will access **Colossus** and retrieve the data
+- When performing queries, **Dremel** modifies them in order to create an execution tree: parts of the query are assigned to different mixers, which in turn assign even smaller parts to different slots which will access **Colossus** and retrieve the data
 
         
 
@@ -179,13 +181,13 @@
 
 - The `CREATE MODEL` clause will create the ML model
 - The `OPTIONS()` clause contains all the necessary arguments to create the model:
-   - model_type='linear_reg' => for specifying that we will create a linear regression model
-   - input_label_cols=['tip_amount'] => lets BQ know that our target feature is tip_amount
-   - DATA_SPLIT_METHOD='AUTO_SPLIT' => is for automatically splitting the dataset into train/test datasets
-- The SELECT statement indicates which features need to be considered for training the model
+   - **model_type='linear_reg'** => for specifying that we will create a linear regression model
+   - **input_label_cols=['tip_amount']** => lets BQ know that our target feature is tip_amount
+   - **DATA_SPLIT_METHOD='AUTO_SPLIT'** => is for automatically splitting the dataset into train/test datasets
+- The `SELECT` statement indicates which features need to be considered for training the model
 - After the query runs successfully, the BQ explorer in the side panel will show all available models with a special icon
    - Selecting the model will open a new tab with additional info such as model details, training graphs, and evaluation metrics.
-- Once you create the model, you will want to EVALUATE and PREDICT with your new model
+- Once you create the model, you will want to **EVALUATE** and **PREDICT** with your new model
    - **EVALUATE EXAMPLE**:
        ```
         SELECT
