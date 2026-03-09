@@ -5,7 +5,7 @@ with trips_data as (
 select
 -- Revenue grouping
 pickup_zone as revenue_zone,
-date_trunc(lpep_pickup_datetime, month) as revenue_month,
+date_trunc(pickup_datetime, month) as revenue_month,
 service_type,
 
 -- Revenue calculation
