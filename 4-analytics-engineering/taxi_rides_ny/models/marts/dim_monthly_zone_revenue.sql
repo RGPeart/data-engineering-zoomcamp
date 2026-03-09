@@ -16,7 +16,7 @@ sum(tip_amount) as revenue_monthly_tip_amount,
 sum(tolls_amount) as revenue_monthly_tolls_amount,
 sum(ehail_fee) as revenue_monthly_ehail_fee,
 sum(improvement_surcharge) as revenue_monthly_improvement_surcharge,
-sum(total_amount) as revenue_monthly_total_aount,
+sum(total_amount) as revenue_monthly_total_amount,
 
 -- Additional calculations
 count(trip_id) as total_monthly_trips,
