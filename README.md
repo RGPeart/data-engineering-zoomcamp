@@ -12,11 +12,13 @@ The repository is organized into modular sections, each addressing a specific le
 
 | Module | Directory | Focus Area | Status |
 |--------|-----------|-----------|--------|
-| **Infrastructure & Data Ingestion** | `1-docker-terraform/` | Docker containerization, data pipelines, Infrastructure-as-Code | ✅ Active |
-| **Workflow Orchestration** | `2-airflow/` | Apache Airflow, DAGs, task scheduling | 🔄 Upcoming |
-| **Data Warehousing** | `3-bigquery/` | Google BigQuery, SQL analytics, data modeling | 🔄 Upcoming |
-| **Data Transformation** | `4-dbt/` | dbt, data modeling, testing, documentation | 🔄 Upcoming |
-| **Distributed Processing** | `5-spark/` | Apache Spark, batch processing, large-scale data | 🔄 Upcoming |
+| **Infrastructure & Data Ingestion** | `1-docker-terraform/` | Docker containerization, data pipelines, Infrastructure-as-Code | ✅ Completed |
+| **Workflow Orchestration** | `2-kestra/` | Apache Kestra, DAGs, task scheduling | ✅ Completed |
+| **Data Warehousing** | `3-bigquery/` | Google BigQuery, SQL analytics, data modeling | ✅ Completed |
+| **Analytics Engineering** | `4-analytics-engineering/` | dbt, data modeling, testing, documentation | ✅ Completed |
+| **Data Platforms** | `5-data-platforms/` | Bruin, end-to-end on one platform | 🔄 In Progress |
+| **Batch Processing** | `6-batch/` | Apache Spark, batch processing, large-scale data | 🔄 Upcoming |
+| **Stream Processing** | `7-streaming/` | PyFlink, stream processing, Kafka | 🔄 Upcoming |
 
 ## Current Module: Docker & Terraform (1-docker-terraform)
 
