@@ -13,7 +13,7 @@ payment_types as (
 cleaned_and_enriched as (
     select
         -- Generate unique trip identifier (surrogate key pattern)
-        {{ dbt_utils.generate_surrogate_key(['u.vendor_id', 'u.lpep_pickup_datetime', 'u.pickup_location_id', 'u.service_type']) }} as trip_id,
+        {{ dbt_utils.generate_surrogate_key(['u.vendor_id', 'u.pickup_datetime', 'u.pickup_location_id', 'u.service_type']) }} as trip_id,
 
         -- Identifiers
         u.vendor_id,
@@ -25,8 +25,8 @@ cleaned_and_enriched as (
         u.dropoff_location_id,
 
         -- Timestamps
-        u.lpep_pickup_datetime,
-        u.lpep_dropoff_datetime,
+        u.pickup_datetime,
+        u.dropoff_datetime,
 
         -- Trip details
         u.store_and_fwd_flag,
@@ -57,6 +57,6 @@ select * from cleaned_and_enriched
 
 -- Deduplicate: if multiple trips match (same vendor, second, location, service), keep first
 qualify row_number() over(
-    partition by vendor_id, lpep_pickup_datetime, pickup_location_id, service_type
-    order by lpep_dropoff_datetime
+    partition by vendor_id, pickup_datetime, pickup_location_id, service_type
+    order by dropoff_datetime
 ) = 1

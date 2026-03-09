@@ -3,12 +3,12 @@
 
 with green_trips as (
     select
-        CAST(vendorid AS integer) AS vendor_id,
-        CAST(ratecodeid AS integer) AS rate_code_id,
-        CAST(pulocationid AS integer) AS pickup_location_id,
-        CAST(dolocationid AS integer) AS dropoff_location_id,
-        lpep_pickup_datetime,
-        lpep_dropoff_datetime,
+        CAST(vendor_id AS integer) AS vendor_id,
+        CAST(rate_code_id AS integer) AS rate_code_id,
+        CAST(pickup_location_id AS integer) AS pickup_location_id,
+        CAST(dropoff_location_id AS integer) AS dropoff_location_id,
+        pickup_datetime,
+        dropoff_datetime,
         store_and_fwd_flag,
         passenger_count,
         trip_distance,

@@ -26,15 +26,15 @@ select
     dz.zone as dropoff_zone,
 
     -- Trip timing
-    trips.lpep_pickup_datetime,
-    trips.lpep_dropoff_datetime,
+    trips.pickup_datetime,
+    trips.dropoff_datetime,
     trips.store_and_fwd_flag,
 
     -- Trip metrics
     trips.passenger_count,
     trips.trip_distance,
     trips.trip_type,
-    {{ get_trip_duration_minutes('trips.lpep_pickup_datetime', 'trips.lpep_dropoff_datetime') }} as trip_duration_minutes,
+    {{ get_trip_duration_minutes('trips.pickup_datetime', 'trips.dropoff_datetime') }} as trip_duration_minutes,
 
     -- Payment breakdown
     trips.fare_amount,
@@ -57,5 +57,5 @@ left join {{ ref('dim_zones') }} as dz
 
 {% if is_incremental() %}
   -- Only process new trips based on pickup datetime
-  where trips.lpep_pickup_datetime > (select max(lpep_pickup_datetime) from {{ this }})
+  where trips.pickup_datetime > (select max(pickup_datetime) from {{ this }})
 {% endif %}
