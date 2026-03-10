@@ -265,3 +265,7 @@ logs/
 
 ### bruin ###
 .bruin.yml
+logs/runs
+logs/*.log
+*.py[cod]
+default
